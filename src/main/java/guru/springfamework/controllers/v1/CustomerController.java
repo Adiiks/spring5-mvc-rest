@@ -31,4 +31,11 @@ public class CustomerController {
     public ResponseEntity<CustomerDTO> createNewCustomer(@RequestBody CustomerDTO customerDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(customerService.createNewCustomer(customerDTO));
     }
+
+    @PutMapping("/{customerId}")
+    public ResponseEntity<CustomerDTO> updateCustomer(@RequestBody CustomerDTO customerDTO,
+                                                      @PathVariable Long customerId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(customerService.saveOrUpdateCustomer(customerId, customerDTO));
+    }
 }

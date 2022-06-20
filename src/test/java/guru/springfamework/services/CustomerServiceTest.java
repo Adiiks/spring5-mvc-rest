@@ -84,6 +84,18 @@ public class CustomerServiceTest {
         assertEquals(CUSTOMER_URL + ID, customerDTO.getCustomerUrl());
     }
 
+    @Test
+    public void saveOrUpdateCustomer() {
+
+        when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+
+        CustomerDTO customerDTO = customerService.saveOrUpdateCustomer(ID, createCustomerDTO());
+
+        assertEquals(FIRSTNAME, customerDTO.getFirstname());
+        assertEquals(LASTNAME, customerDTO.getLastname());
+        assertEquals(CUSTOMER_URL + ID, customerDTO.getCustomerUrl());
+    }
+
     private void createCustomer() {
 
         customer = new Customer();

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CustomerServiceTest {
 
@@ -94,6 +94,14 @@ public class CustomerServiceTest {
         assertEquals(FIRSTNAME, customerDTO.getFirstname());
         assertEquals(LASTNAME, customerDTO.getLastname());
         assertEquals(CUSTOMER_URL + ID, customerDTO.getCustomerUrl());
+    }
+
+    @Test
+    public void deleteCustomerById() {
+
+        customerService.deleteCustomerById(ID);
+
+        verify(customerRepository, times(1)).deleteById(anyLong());
     }
 
     private void createCustomer() {

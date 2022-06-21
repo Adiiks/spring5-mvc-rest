@@ -2,6 +2,8 @@ package guru.springfamework.controllers.v1;
 
 import guru.springfamework.api.v1.model.CustomerDTO;
 import guru.springfamework.api.v1.model.CustomerListDTO;
+import guru.springfamework.controllers.RestResponseEntityExceptionHandler;
+import guru.springfamework.exceptions.ResourceNotFoundException;
 import guru.springfamework.services.CustomerService;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +46,8 @@ public class CustomerControllerTest {
 
         MockitoAnnotations.initMocks(this);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(customerController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(customerController)
+                .setControllerAdvice(new RestResponseEntityExceptionHandler()).build();
 
         createCustomer();
     }
@@ -76,6 +79,15 @@ public class CustomerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstname", equalTo(FIRSTNAME)))
                 .andExpect(jsonPath("$.lastname", equalTo(LASTNAME)));
+    }
+
+    @Test
+    public void getCustomerByIdNotFound() throws Exception {
+
+        when(customerService.findCustomerById(anyLong())).thenThrow(ResourceNotFoundException.class);
+
+        mockMvc.perform(get(CustomerController.BASE_URL + "/1"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -133,6 +145,23 @@ public class CustomerControllerTest {
                 .andExpect(jsonPath("$.firstname", equalTo(updatedFirstname)))
                 .andExpect(jsonPath("$.lastname", equalTo(LASTNAME)))
                 .andExpect(jsonPath("$.customerUrl", equalTo(CUSTOMER_URL)));
+    }
+
+    @Test
+    public void patchCustomerNotFound() throws Exception {
+
+        String updatedFirstname = "Michał";
+
+        CustomerDTO customerDTOToUpdate = new CustomerDTO();
+        customerDTOToUpdate.setFirstname(updatedFirstname);
+
+        when(customerService.patchCustomer(any(CustomerDTO.class), anyLong()))
+                .thenThrow(ResourceNotFoundException.class);
+
+        mockMvc.perform(patch(CustomerController.BASE_URL + "/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(customerDTOToUpdate)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
